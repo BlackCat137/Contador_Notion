@@ -7,7 +7,7 @@
 
 <style>
   :root{
-    --bg: #191919;
+    --bg: #0f1115;
     --text: #e8e8e8;
     --muted: #9aa4b2;
     --btn: #1b1f27;
@@ -78,12 +78,6 @@
     transform:scale(0.96);
   }
 
-  .hint{
-    font-size:12px;
-    color:var(--muted);
-    margin-top:8px;
-  }
-
   canvas{
     position:fixed;
     top:0;
@@ -101,14 +95,14 @@
     <button id="minus">−</button>
     <button id="plus">+</button>
   </div>
-
-  <div class="hint"></div>
 </div>
 
 <canvas id="fx"></canvas>
 
 <script>
 let value = 0;
+const MAX = 5;
+
 const counter = document.getElementById("counter");
 const plusBtn = document.getElementById("plus");
 const minusBtn = document.getElementById("minus");
@@ -122,7 +116,7 @@ function resize(){
 window.addEventListener("resize", resize);
 resize();
 
-/* -------- CONFETTI -------- */
+/* -------- PARTICLES -------- */
 let particles = [];
 
 function confetti(x,y){
@@ -130,14 +124,9 @@ function confetti(x,y){
     particles.push({
       x: x,
       y: y,
-
-      // dispersión reducida
       vx:(Math.random()-0.5)*4,
       vy:(Math.random()-2.2)*5,
-
-      // más gravedad para evitar que salga del área
       g:0.45,
-
       a:1,
       r:Math.random()*2+1.2,
       c:`hsl(${Math.random()*360},80%,60%)`
@@ -149,12 +138,12 @@ function explode(x,y){
   for(let i=0;i<40;i++){
     particles.push({
       x,y,
-      vx:((Math.random()-0.5)*8) * 1,
-      vy:((Math.random()-0.5)*8) * 3,
+      vx:(Math.random()-0.5)*8,
+      vy:(Math.random()-0.5)*8,
       g:0.15,
       a:1,
       r:Math.random()*2+1,
-      c: "rgba(255,255,255,0.8)",
+      c:"rgba(255,255,255,0.8)",
       fade:true
     });
   }
@@ -168,6 +157,7 @@ function loop(){
     p.x += p.vx;
     p.y += p.vy;
     p.vy += p.g;
+
     if(p.fade) p.a -= 0.03;
 
     ctx.globalAlpha = Math.max(p.a,0);
@@ -183,8 +173,20 @@ function loop(){
 }
 loop();
 
-/* -------- BUTTONS -------- */
-const MAX = 5;
+/* -------- BUTTON LOGIC -------- */
+const MIN = 0;
+
+function updateMinusVisibility(){
+  if(value <= MIN){
+    minusBtn.style.opacity = "0";
+    minusBtn.style.pointerEvents = "none";
+    minusBtn.style.transform = "scale(0.8)";
+  } else {
+    minusBtn.style.opacity = "1";
+    minusBtn.style.pointerEvents = "auto";
+    minusBtn.style.transform = "scale(1)";
+  }
+}
 
 plusBtn.onclick = (e) => {
   if (value >= MAX) return;
@@ -199,6 +201,8 @@ plusBtn.onclick = (e) => {
     plusBtn.style.opacity = "0.4";
     plusBtn.style.pointerEvents = "none";
   }
+
+  updateMinusVisibility();
 };
 
 minusBtn.onclick = (e) => {
@@ -221,7 +225,11 @@ minusBtn.onclick = (e) => {
   setTimeout(() => {
     btn.style.visibility = "visible";
   }, 1800);
+
+  updateMinusVisibility();
 };
+
+updateMinusVisibility();
 </script>
 </body>
 </html>
